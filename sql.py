@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, MetaData, Text, Table, Column,func, Float, Integer, CheckConstraint,or_, String, ForeignKey,DateTime, select, desc, asc
+from sqlalchemy import create_engine, MetaData, Text, extract, Table, Column,func, Float, Integer, CheckConstraint,or_, String, ForeignKey,DateTime, select, desc, asc
 
 
 engine = create_engine("postgresql+psycopg2://postgres:Issam%40Issam@localhost:5432/restaurant_db")
@@ -90,9 +90,7 @@ avis = Table(
 
 metadata.create_all(engine)
 
-# Insert data only if tables are empty
 with engine.connect() as conn:
-    # Check if categories table is empty
     result = conn.execute(select(categories.c.id).limit(1))
     if result.fetchone() is None:
         data = [
@@ -106,7 +104,6 @@ with engine.connect() as conn:
         conn.commit()
 
 with engine.connect() as conn:
-    # Check if plats table is empty
     result = conn.execute(select(plats.c.id).limit(1))
     if result.fetchone() is None:
         data = [
@@ -382,21 +379,24 @@ with engine.connect() as conn:
     result = conn.execute(req)
     for row in result:
         print(row)
-# 14. 
-from sqlalchemy import extract
+# 14. Lister les commandes du troisième trimestre 
+# 2025 (juillet à septembre).
+
 with engine.connect() as conn:
-    req = select(
-        commandes.c.id,
-        commandes.c.date_commande,
-        clients.c.nom
-    ).join(clients, commandes.c.client_id == clients.c.id)
-    req = req.where(
-        extract('year', commandes.c.date_commande) == 2025,
-        extract('month', commandes.c.date_commande).in_([7, 8, 9])
-    )
-    result = conn.execute(req)
-    for row in result:
-        print(row)
+    req = select(commandes.c.date_commande).where(commandes.c.date_commande.month()>= 7)
+    res = conn.execute(req)
+
+
+
+
+
+
+
+
+
+
+
+
 # 15.
 with engine.connect() as conn:
    
